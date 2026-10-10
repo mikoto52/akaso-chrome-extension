@@ -1,0 +1,33 @@
+:root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #172e32; background: #f4f8f7; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+.popup { width: 380px; }
+main { padding: 24px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+.brand { color: #087c68; font-weight: 800; font-size: 13px; letter-spacing: 2px; }
+h1 { font-size: 24px; letter-spacing: -.7px; margin: 8px 0 0; }
+label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+textarea, input:not([type=checkbox]), select { width: 100%; border: 1px solid #ccd9d5; border-radius: 10px; background: white; padding: 12px; color: #203c3d; font: inherit; font-size: 13px; }
+textarea { resize: vertical; min-height: 85px; max-height: 170px; overflow-wrap: anywhere; }
+:focus-visible { outline: 3px solid #75cbb7; outline-offset: 2px; }
+button, .secondary { font: inherit; font-size: 13px; cursor: pointer; border: 0; border-radius: 9px; padding: 12px 16px; text-decoration: none; text-align: center; }
+.primary { background: #087c68; color: white; font-weight: 600; }
+.primary:hover { background: #066252; }
+.primary:disabled, button:disabled { opacity: .55; cursor: default; }
+#shorten { width: 100%; margin-top: 8px; }
+.text-button { color: #087c68; background: transparent; padding: 4px 0; }
+.current { font-size: 12px; margin: 10px 0; }
+.secondary { background: #e8efec; color: #254b43; }
+.actions { display: flex; gap: 8px; margin-top: 12px; }
+.actions > * { flex: 1; }
+#status { font-size: 13px; line-height: 1.6; color: #087c68; margin: 16px 0; overflow-wrap: anywhere; }
+#status:empty { display: none; }
+#status.error { color: #b33333; }
+.result { background: #e6f4ef; border: 1px solid #cae4d9; border-radius: 12px; padding: 16px; margin-top: 18px; }
+[hidden] { display: none !important; }
+footer, .note { color: #637976; font-size: 11px; line-height: 1.7; margin-top: 20px; }
+.options { min-height: 100vh; padding: 60px 20px; }
+.settings-card { max-width: 490px; margin: auto; padding: 32px; background: white; border: 1px solid #d9e5df; border-radius: 18px; box-shadow: 0 12px 35px #234a3b09; }
+.intro { color: #637976; font-size: 14px; line-height: 1.7; margin-bottom: 26px; }
+.checkbox { display: flex; align-items: center; gap: 6px; margin: 12px 0 20px; font-weight: 400; color: #637976; }
+.checkbox input { accent-color: #087c68; }

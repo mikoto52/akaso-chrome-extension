@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "AKA.SO URL 줄이기",
+  "version": "1.0.3",
+  "description": "AKA.SO API로 현재 페이지 또는 입력한 URL을 줄이고 복사합니다.",
+  "minimum_chrome_version": "109",
+  "permissions": ["activeTab", "storage", "clipboardWrite"],
+  "host_permissions": ["https://aka.so/*"],
+  "icons": { "16": "icon.png", "32": "icon.png", "48": "icon.png", "128": "icon.png" },
+  "action": { "default_popup": "popup.html", "default_title": "AKA.SO URL 줄이기", "default_icon": { "16": "icon.png", "32": "icon.png" } },
+  "options_ui": { "page": "options.html", "open_in_tab": true }
+}
