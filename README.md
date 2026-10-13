@@ -38,9 +38,11 @@ Chrome 109 이상이 필요합니다.
 ### Userscript
 
 1. 브라우저에 [Tampermonkey](https://www.tampermonkey.net/)를 설치합니다.
-2. Tampermonkey 메뉴에서 **새 스크립트 만들기**를 선택합니다.
-3. 기본 내용을 지우고 [userscript/akaso.user.js](userscript/akaso.user.js) 전체 내용을 붙여넣습니다.
-4. 저장한 뒤 사용하려는 웹사이트를 새로고침합니다.
+2. [AKA.SO Userscript 설치](https://raw.githubusercontent.com/mikoto52/akaso-chrome-extension/refs/heads/master/userscript/akaso.user.js) 링크를 엽니다.
+3. Tampermonkey 설치 화면에서 **설치**를 누릅니다.
+4. 사용하려는 웹사이트를 새로고침합니다.
+
+설치 화면이 자동으로 열리지 않으면 Tampermonkey 메뉴에서 **새 스크립트 만들기**를 선택하고, 기본 내용을 설치 URL의 스크립트 전체 내용으로 교체한 뒤 저장합니다.
 
 Tampermonkey가 userscript 실행에 필요한 브라우저 설정을 안내하면 활성화하세요. HTTP/HTTPS 웹사이트의 최상위 페이지에서 실행하며, 브라우저 내부 페이지와 스크립트 실행이 제한된 페이지에서는 표시되지 않습니다.
 
