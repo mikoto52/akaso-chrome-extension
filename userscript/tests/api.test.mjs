@@ -5,12 +5,12 @@ import vm from 'node:vm';
 
 const source = await readFile(new URL('../akaso.user.js', import.meta.url), 'utf8');
 
-function setup(handler, timers = { setTimeout, clearTimeout }) {
-  const window = {};
+function setup(handler, timers = { setTimeout, clearTimeout }, environment = {}) {
+  const window = { isSecureContext: true };
   window.top = window.self = window;
-  const context = vm.createContext({ window, URL, FormData, GM_xmlhttpRequest: handler, ...timers });
+  const context = vm.createContext({ window, navigator: {}, URL, FormData, GM_xmlhttpRequest: handler, ...timers, ...environment });
   const functions = source.slice(0, source.indexOf('  const host ='));
-  vm.runInContext(functions + '\n globalThis.api = { shortenUrl, validateHttpStatusCode, validateUrl, extractShortUrl };\n})();', context);
+  vm.runInContext(functions + '\n globalThis.api = { shortenUrl, validateHttpStatusCode, validateUrl, extractShortUrl, copyText };\n})();', context);
   return context.api;
 }
 
@@ -103,4 +103,53 @@ test('enforces its own timeout and aborts when the manager does not time out', a
   await assert.rejects(pending, /시간이 초과/);
   assert.equal(aborted, true);
   assert.equal(cleared, true);
+});
+
+test('starts native clipboard writing immediately and waits for completion', async () => {
+  let text;
+  let complete;
+  let done = false;
+  const api = setup(undefined, undefined, {
+    navigator: { clipboard: { writeText(value) { text = value; return new Promise(resolve => { complete = resolve; }); } } },
+    GM_setClipboard: () => assert.fail('native success should not use the manager')
+  });
+  const pending = api.copyText('https://aka.so/aa11').then(() => { done = true; });
+  assert.equal(text, 'https://aka.so/aa11');
+  await Promise.resolve();
+  assert.equal(done, false);
+  complete();
+  await pending;
+  assert.equal(done, true);
+});
+
+test('falls back to the manager after denied native clipboard access', async () => {
+  let text;
+  const api = setup(undefined, undefined, {
+    navigator: { clipboard: { writeText: async () => { throw new Error('NotAllowedError'); } } },
+    GM_setClipboard(value, type, done) { text = value; assert.equal(type, 'text'); done(); }
+  });
+  await api.copyText('https://aka.so/aa11');
+  assert.equal(text, 'https://aka.so/aa11');
+});
+
+test('supports promise-based manager clipboard completion', async () => {
+  const api = setup(undefined, undefined, { GM_setClipboard: async () => {} });
+  await api.copyText('https://aka.so/aa11');
+});
+
+test('does not claim success when the manager gives no completion signal', async () => {
+  let timeout;
+  const api = setup(undefined, {
+    setTimeout(callback, ms) { assert.equal(ms, 2000); timeout = callback; return 1; },
+    clearTimeout() {}
+  }, { GM_setClipboard: () => {} });
+  const pending = api.copyText('https://aka.so/aa11');
+  timeout();
+  await assert.rejects(pending, /확인/);
+});
+
+test('reports unavailable and rejected clipboard APIs', async () => {
+  await assert.rejects(setup().copyText('https://aka.so/aa11'), /사용할 수 없습니다/);
+  const api = setup(undefined, undefined, { GM_setClipboard: async () => { throw new Error('permission denied'); } });
+  await assert.rejects(api.copyText('https://aka.so/aa11'), /permission denied/);
 });

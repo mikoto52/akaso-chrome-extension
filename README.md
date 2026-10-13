@@ -5,7 +5,7 @@ AKA.SO API로 현재 페이지 또는 직접 입력한 URL을 단축합니다. C
 | 버전 | 실행 방식 | 소스 | 현재 버전 |
 | --- | --- | --- | --- |
 | Chrome 확장 | 도구 모음에서 팝업 열기 | [aka-so-extension](aka-so-extension/) | 1.0.3 |
-| Userscript | 웹사이트 우측 하단의 아이콘 누르기 | [akaso.user.js](userscript/akaso.user.js) | 1.0.3 |
+| Userscript | 웹사이트 우측 하단의 아이콘 누르기 | [akaso.user.js](userscript/akaso.user.js) | 1.0.4 |
 
 두 버전은 독립적으로 설치하고 배포합니다. API 토큰과 기본 상태 코드 설정은 공유하지 않습니다.
 
@@ -72,6 +72,8 @@ HTTP 또는 HTTPS URL만 사용할 수 있습니다. 요청이 끝날 때까지 
 아이콘을 오른쪽으로 32px 이상 끌면 숨겨집니다. Tampermonkey 메뉴의 **AKA.SO 아이콘 다시 표시**로 복구하거나 페이지를 새로고침하면 다시 나타납니다. 숨긴 상태에서도 메뉴의 **AKA.SO 설정**으로 설정을 열 수 있습니다.
 
 업데이트할 때는 Tampermonkey에서 기존 스크립트 내용을 새 파일 내용으로 교체하고 저장한 뒤 페이지를 새로고침합니다.
+
+패널을 열 때 입력란에 자동으로 포커스를 주지 않습니다. 복사 버튼은 브라우저 클립보드 API를 우선 사용하고, 필요한 경우 Tampermonkey API로 대체합니다. 자동 복사가 실패하면 단축 URL을 길게 눌러 직접 복사할 수 있습니다.
 
 ## API
 
@@ -171,7 +173,7 @@ Windows와 macOS의 일반 Chrome에서는 웹 스토어 밖의 CRX 직접 설�
 
 [userscript/akaso.user.js](userscript/akaso.user.js) 파일 하나를 배포합니다. Chrome 확장 ZIP 또는 CRX에는 userscript를 넣지 않습니다.
 
-두 버전의 버전 번호는 각각 `manifest.json`과 userscript의 `@version`에서 관리합니다. 릴리스 태그는 `extension-v1.0.3`, `userscript-v1.0.3`처럼 구분할 수 있습니다.
+두 버전의 버전 번호는 각각 `manifest.json`과 userscript의 `@version`에서 관리합니다. 릴리스 태그는 `extension-v1.0.3`, `userscript-v1.0.4`처럼 구분할 수 있습니다.
 
 ## 테스트
 

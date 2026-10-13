@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AKA.SO URL 줄이기
 // @namespace    https://github.com/mikoto52/akaso-chrome-extension
-// @version      1.0.3
+// @version      1.0.4
 // @description  우측 하단 아이콘으로 URL을 줄이고, 오른쪽으로 스와이프해 숨깁니다.
 // @match        http://*/*
 // @match        https://*/*
@@ -135,6 +135,29 @@
     });
   }
 
+  async function copyText(text) {
+    // Start during the button's click handler: Safari requires a user gesture.
+    if (window.isSecureContext && typeof navigator.clipboard?.writeText === 'function') {
+      try { await navigator.clipboard.writeText(text); return; }
+      catch { /* Try the userscript manager when the page denies clipboard access. */ }
+    }
+    if (typeof GM_setClipboard !== 'function') throw new Error('클립보드 API를 사용할 수 없습니다.');
+    await new Promise((resolve, reject) => {
+      let settled = false;
+      function finish(error) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (error) reject(error); else resolve();
+      }
+      const timer = setTimeout(() => finish(new Error('클립보드 복사 완료를 확인하지 못했습니다.')), 2000);
+      try {
+        const result = GM_setClipboard(text, 'text', () => finish());
+        if (result && typeof result.then === 'function') result.then(() => finish(), finish);
+      } catch (error) { finish(error); }
+    });
+  }
+
   const host = document.createElement('div');
   host.id = 'akaso-userscript';
   // Keep styles and token input separate from the site's DOM and CSS.
@@ -201,6 +224,7 @@
       .note { font-size: 11px; color: #637976; margin: 14px 0 0; }
       .checkbox { display: flex; align-items: center; gap: 6px; color: #637976; font-weight: 400; }
       @media (prefers-reduced-motion: reduce) { .launcher { transition: none; } }
+      @media (pointer: coarse) { input:not([type=checkbox]), textarea, select { font-size: 16px; } }
     `]),
     element("button", {"id": "launcher", "class": "launcher", "type": "button", "title": "AKA.SO 열기 · 오른쪽으로 밀면 숨기기", "aria-label": "AKA.SO URL 줄이기 열기", "aria-expanded": "false", "aria-controls": "panel"}, [
       element("img", {"alt": "", "draggable": "false"})
@@ -370,7 +394,6 @@
     $('token').type = 'password';
     $('show-token').checked = false;
     $('title').textContent = '긴 링크를 짧게.';
-    $('url').focus();
   }
 
   function showIcon() {
@@ -397,7 +420,6 @@
       try { $('http-status-code').value = String(validateHttpStatusCode(settings.httpStatusCode)); }
       catch { $('http-status-code').value = String(DEFAULT_HTTP_STATUS_CODE); }
     } catch { status('설정을 읽지 못했습니다.', true, 'settings-status'); }
-    $('token').focus();
   }
 
   $('launcher').addEventListener('click', event => {
@@ -407,7 +429,6 @@
     showMain();
     $('panel').hidden = false;
     $('launcher').setAttribute('aria-expanded', 'true');
-    $('url').focus();
   });
   $('launcher').addEventListener('pointerdown', event => {
     if (!event.isPrimary || event.button !== 0) return;
@@ -485,9 +506,17 @@
       $('shorten').textContent = 'URL 줄이기';
     }
   });
-  $('copy').addEventListener('click', () => {
-    try { GM_setClipboard($('short-url').value, 'text'); status('클립보드에 복사했습니다.'); }
-    catch { $('short-url').focus(); $('short-url').select(); status('선택된 URL을 직접 복사해 주세요.', true); }
+  let copying = false;
+  $('copy').addEventListener('click', async () => {
+    if (copying) return;
+    copying = true;
+    $('copy').disabled = true;
+    try {
+      await copyText($('short-url').value);
+      status('클립보드에 복사했습니다.');
+    } catch {
+      status('자동 복사를 완료하지 못했습니다. 단축 URL을 길게 누르거나 선택해 직접 복사해 주세요.', true);
+    } finally { copying = false; $('copy').disabled = false; }
   });
   $('open').addEventListener('click', () => {
     try { GM_openInTab($('short-url').value, { active: true, insert: true }); }
